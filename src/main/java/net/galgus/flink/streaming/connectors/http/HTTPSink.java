@@ -7,10 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class HTTPSink<IN> extends RichSinkFunction<IN> {
     private static final Logger log = LoggerFactory.getLogger(HTTPSink.class);
@@ -24,11 +25,15 @@ public class HTTPSink<IN> extends RichSinkFunction<IN> {
     public void invoke(IN value, Context context) throws Exception {
         if (value != null) {
             URL url = new URL(httpConnectionConfig.getEndpoint());
-            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            
+            HttpURLConnection conn = httpConnectionConfig.isHttpsEnabled() ? (HttpsURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection();
+            
             conn.setDoOutput(true);
             conn.setRequestMethod(httpConnectionConfig.getMethod());
+            
             httpConnectionConfig.getHeaders().forEach(conn::setRequestProperty);
-            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream(), "UTF-8");
+            
+            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8);
             writer.write(value.toString());
             writer.close();
 
@@ -42,7 +47,7 @@ public class HTTPSink<IN> extends RichSinkFunction<IN> {
                     error.append(inputLine);
                 }
                 in.close();
-                throw new IOException("HTTP Response code: " + status
+                log.error("HTTP Response code: " + status
                         + ", " + conn.getResponseMessage() + ", " + error
                         + ", Submitted payload: " + value.toString()
                         + ", url:" + httpConnectionConfig.getEndpoint());

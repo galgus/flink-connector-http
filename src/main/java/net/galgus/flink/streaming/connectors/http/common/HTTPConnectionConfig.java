@@ -16,11 +16,13 @@ public class HTTPConnectionConfig implements Serializable {
     private String endpoint;
     private HTTPMethod method = HTTPMethod.POST;
     private Map<String, String> headers = new HashMap<>();
+    private boolean isHttpsEnabled;
 
-    public HTTPConnectionConfig(String endpoint, HTTPMethod method, Map<String, String> headers) {
+    public HTTPConnectionConfig(String endpoint, HTTPMethod method, Map<String, String> headers, boolean isHttpsEnabled) {
         this.endpoint = endpoint;
         this.method = method;
         this.headers = headers;
+        this.isHttpsEnabled = isHttpsEnabled;
     }
 
     public Map<String, String> getHeaders() {
@@ -42,11 +44,20 @@ public class HTTPConnectionConfig implements Serializable {
     public void setMethod(HTTPMethod method) {
         this.method = method;
     }
-    
+
+    public boolean isHttpsEnabled() {
+        return isHttpsEnabled;
+    }
+
+    public void setEnableHttps(boolean isEnabled) {
+        isHttpsEnabled = isEnabled;
+    }
+
     public static class Builder {
         private String endpoint;
         private HTTPMethod method;
         private Map<String, String> headers = new HashMap<>();
+        private boolean isHttpsEnabled;
         
         public Builder setEndpoint(String endpoint) {
             this.endpoint = endpoint;
@@ -55,6 +66,11 @@ public class HTTPConnectionConfig implements Serializable {
         
         public Builder setMethod(String method) {
             this.method = HTTPMethod.valueOf(method.toUpperCase());
+            return this;
+        }
+        
+        public Builder setHttpsEnabled(boolean isEnabled) {
+            this.isHttpsEnabled = isEnabled;
             return this;
         }
         
@@ -76,7 +92,7 @@ public class HTTPConnectionConfig implements Serializable {
         }
         
         public HTTPConnectionConfig build() {
-            return new HTTPConnectionConfig(endpoint, method, headers);
+            return new HTTPConnectionConfig(endpoint, method, headers, isHttpsEnabled);
         }
         
         
