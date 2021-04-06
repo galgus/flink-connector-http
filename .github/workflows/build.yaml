@@ -3,6 +3,5 @@ name: Java Maven build
 on: [push]
 
 Jobs:
-  build:
-    name: job1
-    runs-on: macos-latest
+  my_first_job:
+    name: my job
