@@ -3,5 +3,5 @@ name: Java Maven build
 on: [push]
 
 Jobs:
-  my_first_job:
-    name: my job
+  - build:
+      name: build maven
