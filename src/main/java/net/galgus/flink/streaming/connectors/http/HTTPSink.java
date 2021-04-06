@@ -38,8 +38,10 @@ public class HTTPSink<IN> extends RichSinkFunction<IN> {
             writer.close();
 
             int status = conn.getResponseCode();
-            log.info("Status code: " + status);
-            log.info("Message: " + conn.getResponseMessage());
+            log.info("Status={}", status);
+            if(status == 200) {
+                log.info("Message: The request has succeeded" );
+            }
 
             if (status != 200) {
                 BufferedReader in = new BufferedReader(
