@@ -3,7 +3,7 @@ name: Java Maven build
 on: [push]
 
 Jobs:
-  build:
+  jar_creation:
     runs-on: macos-latest
 
     steps:
