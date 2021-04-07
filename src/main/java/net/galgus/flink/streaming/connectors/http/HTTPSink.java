@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 public class HTTPSink<IN> extends RichSinkFunction<IN> {
     private static final Logger log = LoggerFactory.getLogger(HTTPSink.class);
@@ -25,9 +26,10 @@ public class HTTPSink<IN> extends RichSinkFunction<IN> {
     public void invoke(IN value, Context context) throws Exception {
         if (value != null) {
             URL url = new URL(httpConnectionConfig.getEndpoint());
-            
+
+            long start = System.currentTimeMillis();
+
             HttpURLConnection conn = httpConnectionConfig.isHttpsEnabled() ? (HttpsURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection();
-            
             conn.setDoOutput(true);
             conn.setRequestMethod(httpConnectionConfig.getMethod());
             
@@ -38,12 +40,12 @@ public class HTTPSink<IN> extends RichSinkFunction<IN> {
             writer.close();
 
             int status = conn.getResponseCode();
-            log.info("Status={}", status);
-            if(status == 200) {
-                log.info("Message: The request has succeeded" );
-            }
+            if(status >= 200 && status < 300) {
+                log.info("URL = {}", conn.getURL());
+                log.info("HTTP Response code = {}", status);
+                log.info("HTTP Message: The request has succeeded, {}", conn.getResponseMessage());
 
-            if (status != 200) {
+            }else if (status != 200) {
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(conn.getErrorStream()));
                 String inputLine;
@@ -63,6 +65,8 @@ public class HTTPSink<IN> extends RichSinkFunction<IN> {
                     + ", headers: " + httpConnectionConfig.getHeaders());
             
             conn.disconnect();
+            long elapsedTime = System.currentTimeMillis() - start;
+            log.info("Request Duration = " + Long.toString(elapsedTime) + " ms");
         }
     }
 }
