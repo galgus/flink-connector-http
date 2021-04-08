@@ -3,34 +3,15 @@ name: Java Maven build
 on: [push]
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 11
-        uses: actions/setup-java@v2
+      - uses: actions/setup-java@v2
         with:
           java-version: '11'
           distribution: 'adopt'
-      - name: Extract Maven project version
-        run: echo ::set-output name=version::$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
-        id: project
-
-      - name: Show extracted Maven project version
-        run: echo ${{ steps.project.outputs.version }}
-
       - name: Publish to GitHub Packages
+        run: mvn deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "<settings><servers><server><id>github</id><username>globeandmail</username><password>${GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
-          mvn deploy
-#      - name: copy jar to staging
-#        run: mkdir staging && cp target/*.jar staging
-#      - uses: actions/upload-artifact@v2
-#        with:
-#          name: flink-connector-http-${{steps.project.outputs.version}}
-#          path: staging
-
-
