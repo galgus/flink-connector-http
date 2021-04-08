@@ -27,7 +27,7 @@ public class HTTPSink<IN> extends RichSinkFunction<IN> {
         if (value != null) {
             URL url = new URL(httpConnectionConfig.getEndpoint());
 
-            long start = System.currentTimeMillis();
+            long start = System.nanoTime();
 
             HttpURLConnection conn = httpConnectionConfig.isHttpsEnabled() ? (HttpsURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
@@ -40,12 +40,7 @@ public class HTTPSink<IN> extends RichSinkFunction<IN> {
             writer.close();
 
             int status = conn.getResponseCode();
-            if(status >= 200 && status < 300) {
-                log.info("URL = {}", conn.getURL());
-                log.info("HTTP Response code = {}", status);
-                log.info("HTTP Message: The request has succeeded, {}", conn.getResponseMessage());
-
-            }else if (status != 200) {
+            if (status != 200) {
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(conn.getErrorStream()));
                 String inputLine;
@@ -65,8 +60,10 @@ public class HTTPSink<IN> extends RichSinkFunction<IN> {
                     + ", headers: " + httpConnectionConfig.getHeaders());
             
             conn.disconnect();
-            long elapsedTime = System.currentTimeMillis() - start;
-            log.info("Request Duration = " + Long.toString(elapsedTime) + " ms");
+            long elapsedNano = System.nanoTime() - start;
+            long elapsedTime = TimeUnit.NANOSECONDS.toMillis(elapsedNano);
+            log.info("Request from url = {}, with status = {} and message = {} in duration = {}ms",
+                    conn.getURL(), status, conn.getResponseMessage(), Long.toString(elapsedTime));
         }
     }
 }
