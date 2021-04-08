@@ -37,4 +37,13 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub globeandmail Apache Maven Packages</name>
+            <url>https://github.com/globeandmail/flink-connector-http</url>
+        </repository>
+    </distributionManagement>
+
 </project>
