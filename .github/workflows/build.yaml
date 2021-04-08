@@ -21,9 +21,10 @@ jobs:
         run: echo ${{ steps.project.outputs.version }}
 
       - name: Publish to GitHub Packages
-          env:
-            GITHUB_TOKEN: ${{ github.token }}
-          run: mvn deploy
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: mvn deploy
+
 #      - name: copy jar to staging
 #        run: mkdir staging && cp target/*.jar staging
 #      - uses: actions/upload-artifact@v2
