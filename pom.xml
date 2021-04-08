@@ -42,7 +42,7 @@
         <repository>
             <id>github</id>
             <name>GitHub globeandmail Apache Maven Packages</name>
-            <url>https://github.com/globeandmail/flink-connector-http</url>
+            <url>https://maven.pkg.github.com/globeandmail/flink-connector-http</url>
         </repository>
     </distributionManagement>
 
