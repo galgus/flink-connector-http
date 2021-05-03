@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 public class HTTPSink<IN> extends RichSinkFunction<IN> {
     private static final Logger log = LoggerFactory.getLogger(HTTPSink.class);
@@ -25,9 +26,10 @@ public class HTTPSink<IN> extends RichSinkFunction<IN> {
     public void invoke(IN value, Context context) throws Exception {
         if (value != null) {
             URL url = new URL(httpConnectionConfig.getEndpoint());
-            
+
+            long start = System.nanoTime();
+
             HttpURLConnection conn = httpConnectionConfig.isHttpsEnabled() ? (HttpsURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection();
-            
             conn.setDoOutput(true);
             conn.setRequestMethod(httpConnectionConfig.getMethod());
             
@@ -58,6 +60,10 @@ public class HTTPSink<IN> extends RichSinkFunction<IN> {
                     + ", headers: " + httpConnectionConfig.getHeaders());
             
             conn.disconnect();
+            long elapsedNano = System.nanoTime() - start;
+            long elapsedTime = TimeUnit.NANOSECONDS.toMillis(elapsedNano);
+            log.info("Request from url = {}, with status = {} and message = {} in duration = {}ms",
+                    conn.getURL(), status, conn.getResponseMessage(), Long.toString(elapsedTime));
         }
     }
 }

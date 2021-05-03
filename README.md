@@ -26,7 +26,7 @@ This command will install all the components in your `.m2` directory. To use you
 
 ```
 <dependency>
-  <groupId>net.galgus</groupId>
+  <groupId>tgamforks</groupId>
   <artifactId>flink-connector-http</artifactId>
   <version>1.0-SNAPSHOT</version>
 </dependency>
